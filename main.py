@@ -15,6 +15,9 @@ help_doc = "---Help Functions---\n!join - Enter the casino to be eligible for ro
 
 GAME_LIMIT = 10000
 NEW_GAME_LIMIT = 10000
+LIMIT_CHANGE = 0
+LIMIT_CHANGE_USER = ""
+LIMIT_CHANGE_VALUE = 0
 
 client = discord.Client()
 
@@ -108,10 +111,31 @@ def all_stats():
   return all_stats
 
 # Sets the game limit.
-def set_game_limit(number):
-  if int(number) > 0:
-    global NEW_GAME_LIMIT
-    NEW_GAME_LIMIT = int(number)
+def set_game_limit(user_ID, number):
+  user_ID = str(user_ID)
+  number = int(number)
+  global LIMIT_CHANGE
+  global LIMIT_CHANGE_USER
+  global LIMIT_CHANGE_VALUE
+  
+  if LIMIT_CHANGE == 1:
+    if user_ID != LIMIT_CHANGE_USER:
+      if LIMIT_CHANGE_VALUE == number:
+        global NEW_GAME_LIMIT
+        NEW_GAME_LIMIT = number
+        LIMIT_CHANGE = 0
+        webhook.send('Limit set to {limit} gold! Change will take effect next roll.'.format(limit = number))
+        return
+      else:
+        LIMIT_CHANGE = 0
+    else:
+      LIMIT_CHANGE = 0
+  
+  if LIMIT_CHANGE == 0:
+    LIMIT_CHANGE = 1
+    LIMIT_CHANGE_USER = user_ID
+    LIMIT_CHANGE_VALUE = number
+    webhook.send('1/2 players needed to set the limit to {limit} gold.'.format(limit = number))
     return
 
 # Checks if the user has enough gold for the roll.
@@ -228,13 +252,13 @@ def gamble_roll():
 
   # restart roll timer
   x=datetime.today()
-  y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(hours=1)
+  y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(hours=6)
   delta_t=y-x
   secs=delta_t.total_seconds()
   t = Timer(secs, gamble_roll)
   t.start()
   
-  webhook.send('Welcome to Impetus Nox Gambling! A new game has begun for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 1 hour.'.format(limit = GAME_LIMIT))
+  webhook.send('Welcome to Impetus Nox Gambling! A new game has begun for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 6 hours.'.format(limit = GAME_LIMIT))
   return
 
 @client.event
@@ -273,8 +297,7 @@ async def on_message(message):
 
   if message.content.startswith('!limit'):
     limit = message.content.split("!limit ",1)[1]
-    set_game_limit(limit)
-    webhook.send('Limit set to {limit} gold! Change will take effect next roll.'.format(limit = limit))
+    set_game_limit(message.author, limit)
   
   if message.content == "1":
     join_roll(message.author, GAME_LIMIT)
@@ -302,7 +325,7 @@ delta_t=y-x
 secs=delta_t.total_seconds()
 t = Timer(secs, gamble_roll)
 t.start()
-webhook.send('Welcome to Impetus Nox Gambling! A new game has begun for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 1 hour.'.format(limit = GAME_LIMIT))
+webhook.send('Welcome to Impetus Nox Gambling! A new game has begun for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 6 hours.'.format(limit = GAME_LIMIT))
 
 for key in db:
   if key == "The House#0000":
