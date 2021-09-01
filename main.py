@@ -11,7 +11,7 @@ laser_webhook = os.environ['Laser_House']
 
 webhook = Webhook.from_url(str(laser_webhook), adapter=RequestsWebhookAdapter())
 
-help_doc = "---Help Functions---\n!join - Enter the casino to be eligible for rolls. New players start with 50000 gold.\n!stats - To view how much gold you currently have and how much you won/lost.\n!allstats - To view how much gold ALL players have and how much they won/lost.\nlimit x - Where x is the amount you want to change the limit to. At least 2 players must vote on this change. Change will take effect next roll.\nOnce you join the casino, every Tuesday you will be given an incentive to play and gain an additional "
+help_doc = "---Help Functions---\n!join - Enter the casino to be eligible for rolls. New players start with 50000 gold.\n!stats - To view how much gold you currently have and how much you won/lost.\n!allstats - To view how much gold ALL players have and how much they won/lost.\nlimit x - Where x is the amount you want to change the limit to. At least 2 players must vote on this change. Change will take effect next roll."
 
 GAME_LIMIT = 10000
 NEW_GAME_LIMIT = 10000
@@ -258,7 +258,7 @@ def gamble_roll():
   t = Timer(secs, gamble_roll)
   t.start()
   
-  webhook.send('Welcome to Impetus Nox Gambling! A new game has begun for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 6 hours.'.format(limit = GAME_LIMIT))
+  webhook.send('Welcome to Impetus Nox Gambling! A new game has started for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 6 hours.'.format(limit = GAME_LIMIT))
   return
 
 @client.event
@@ -320,16 +320,31 @@ for key in db:
   db[key]["current_game_roll"] = 0
 
 x=datetime.today()
-y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(hours=1)
+print(x)
+# hour 4 = midnight on this server.
+if (x.hour < 4):
+  y = x.replace(day=x.day, hour=4, minute=0, second=0, microsecond=0) + timedelta(days=0)
+if (x.hour > 3) and (x.hour < 11):
+  y = x.replace(day=x.day, hour=10, minute=0, second=0, microsecond=0) + timedelta(days=0)
+if (x.hour > 9) and (x.hour < 17):
+  y = x.replace(day=x.day, hour=16, minute=0, second=0, microsecond=0) + timedelta(days=0)
+if (x.hour > 15) and (x.hour < 23):
+  y = x.replace(day=x.day, hour=22, minute=0, second=0, microsecond=0) + timedelta(days=0)
+if x.hour > 21:
+  y = x.replace(day=x.day, hour=4, minute=0, second=0, microsecond=0) + timedelta(days=1)
+print(y)
 delta_t=y-x
 secs=delta_t.total_seconds()
+print(secs)
 t = Timer(secs, gamble_roll)
 t.start()
-webhook.send('Welcome to Impetus Nox Gambling! A new game has begun for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 6 hours.'.format(limit = GAME_LIMIT))
+#webhook.send('Welcome to Impetus Nox Gambling! A new game has begun for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 6 hours.'.format(limit = GAME_LIMIT))
 
 for key in db:
   if key == "The House#0000":
     del db["The House#0000"]
+  if key == "TEST":
+    del db["TEST"]
 
 keep_alive()
 client.run(os.getenv('TOKEN'))
