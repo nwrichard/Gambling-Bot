@@ -192,7 +192,7 @@ def gamble_roll():
       "name": str("TEST"),
       "current_gold": 50000,
       "overall_stats": 0,
-      "playing_current_game": True,
+      "playing_current_game": False,
       "current_game_roll": 0
     }
 
@@ -254,7 +254,7 @@ def gamble_roll():
   x=datetime.today()
   y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(hours=6)
   # Thursday is power hour for raid.
-  if (x.hour < 6) and (datetime.datetime.today().weekday()) == 4:
+  if (x.hour < 6) and (datetime.today().weekday()) == 4:
     y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(minutes=10)
   delta_t=y-x
   secs=delta_t.total_seconds()
