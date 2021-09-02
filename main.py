@@ -345,7 +345,7 @@ secs=delta_t.total_seconds()
 print(secs)
 t = Timer(secs, gamble_roll)
 t.start()
-#webhook.send('Welcome to Impetus Nox Gambling! A new game has begun for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 6 hours.'.format(limit = GAME_LIMIT))
+webhook.send('Welcome to Impetus Nox Gambling! A new game has started for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in 6 hours.'.format(limit = GAME_LIMIT))
 
 for key in db:
   if key == "The House#0000":
