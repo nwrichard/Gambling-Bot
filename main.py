@@ -205,6 +205,9 @@ def gamble_roll():
     if check_if_playing_current_game(key) == True:
       players = players + 1
 
+  if players < 2:
+    webhook.send('Not enough players for this roll!')
+
   if players >= 2:
     for key in db:
       if check_if_playing_current_game(key) == True:
