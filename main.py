@@ -254,7 +254,7 @@ def gamble_roll():
   x=datetime.today()
   y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(hours=6)
   # Thursday is power hour for raid.
-  if (x.hour < 6) and (datetime.datetime.today().weekday()) == 3:
+  if (x.hour < 6) and (datetime.datetime.today().weekday()) == 4:
     y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(minutes=10)
   delta_t=y-x
   secs=delta_t.total_seconds()
@@ -329,7 +329,7 @@ print(x)
 if (x.hour < 4):
   y = x.replace(day=x.day, hour=4, minute=0, second=0, microsecond=0) + timedelta(days=0)
   #Thursday is power hour for raid.
-  if datetime.datetime.today().weekday() == 3:
+  if datetime.today().weekday() == 4:
     y = x.replace(day=x.day, hour=1, minute=30, second=0, microsecond=0) + timedelta(days=0)
 if (x.hour > 3) and (x.hour < 11):
   y = x.replace(day=x.day, hour=10, minute=0, second=0, microsecond=0) + timedelta(days=0)
