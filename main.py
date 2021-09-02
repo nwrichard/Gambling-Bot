@@ -253,6 +253,9 @@ def gamble_roll():
   # restart roll timer
   x=datetime.today()
   y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(hours=6)
+  # Thursday is power hour for raid.
+  if (x.hour < 6) and (datetime.datetime.today().weekday()) == 3:
+    y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(minutes=10)
   delta_t=y-x
   secs=delta_t.total_seconds()
   t = Timer(secs, gamble_roll)
@@ -319,11 +322,15 @@ for key in db:
   db[key]["playing_current_game"] = False
   db[key]["current_game_roll"] = 0
 
+# Set timing for first roll since it won't be exactly 6 hours from now.
 x=datetime.today()
 print(x)
 # hour 4 = midnight on this server.
 if (x.hour < 4):
   y = x.replace(day=x.day, hour=4, minute=0, second=0, microsecond=0) + timedelta(days=0)
+  #Thursday is power hour for raid.
+  if datetime.datetime.today().weekday() == 3:
+    y = x.replace(day=x.day, hour=1, minute=30, second=0, microsecond=0) + timedelta(days=0)
 if (x.hour > 3) and (x.hour < 11):
   y = x.replace(day=x.day, hour=10, minute=0, second=0, microsecond=0) + timedelta(days=0)
 if (x.hour > 9) and (x.hour < 17):
