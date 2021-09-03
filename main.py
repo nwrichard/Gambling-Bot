@@ -5,13 +5,13 @@ from datetime import datetime, timedelta
 from threading import Timer
 from discord import Webhook, RequestsWebhookAdapter
 
-#impetus_nox_webhook = os.environ['Impetus_Nox_Webhook']
+impetus_nox_webhook = os.environ['Impetus_Nox_Webhook']
 #beans_webhook = os.environ['Beans_Webhook']
-laser_webhook = os.environ['Laser_House']
+#laser_webhook = os.environ['Laser_House']
 
-webhook = Webhook.from_url(str(laser_webhook), adapter=RequestsWebhookAdapter())
+webhook = Webhook.from_url(str(impetus_nox_webhook), adapter=RequestsWebhookAdapter())
 
-help_doc = "---Help Functions---\n!join - Enter the casino to be eligible for rolls. New players start with 50000 gold.\n!stats - To view how much gold you currently have and how much you won/lost.\n!allstats - To view how much gold ALL players have and how much they won/lost.\nlimit x - Where x is the amount you want to change the limit to. At least 2 players must vote on this change. Change will take effect next roll."
+help_doc = "---Help Functions---\n!join - Enter the casino to be eligible for rolls. New players start with 100,000 gold.\n!stats - To view how much gold you currently have and how much you won/lost.\n!allstats - To view how much gold ALL players have and how much they won/lost.\nlimit x - Where x is the amount you want to change the limit to. At least 2 players must vote on this change. Change will take effect next roll."
 
 GAME_LIMIT = 10000
 NEW_GAME_LIMIT = 10000
@@ -30,7 +30,7 @@ def add_user(user_ID):
   else:
     db[user_ID] = {
       "name": str(user_ID),
-      "current_gold": 50000,
+      "current_gold": 100000,
       "overall_stats": 0,
       "playing_current_game": False,
       "current_game_roll": 0
@@ -287,7 +287,7 @@ async def on_message(message):
       webhook.send('You are already gambling, {message_author}!'.format(message_author = message.author))
     else:
       add_user(message.author)
-      webhook.send('Welcome to Impetus Nox Gambling, {message_author}! You start with 50000 gold!'.format(message_author = message.author.mention))
+      webhook.send('Welcome to Impetus Nox Gambling, {message_author}! You start with 100,000 gold!'.format(message_author = message.author.mention))
 
   if message.content == "!admin_leave":
     delete_user(message.author)
