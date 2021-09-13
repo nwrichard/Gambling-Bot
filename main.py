@@ -11,7 +11,7 @@ impetus_nox_webhook = os.environ['Impetus_Nox_Webhook']
 
 webhook = Webhook.from_url(str(impetus_nox_webhook), adapter=RequestsWebhookAdapter())
 
-help_doc = "---Help Functions---\n!join - Enter the casino to be eligible for rolls. New players start with 100,000 gold.\n!stats - To view how much gold you currently have and how much you won/lost.\n!allstats - To view how much gold ALL players have and how much they won/lost.\nlimit x - Where x is the amount you want to change the limit to. At least 2 players must vote on this change. Change will take effect next roll."
+help_doc = "---Help Functions---\n!join - Enter the casino to be eligible for rolls. New players start with 100,000 gold.\n!stats - To view how much gold you currently have and how much you won/lost.\n!allstats - To view how much gold ALL players have and how much they won/lost.\n!limit x - Where x is the amount you want to change the limit to. At least 2 players must vote on this change. Change will take effect next roll."
 
 GAME_LIMIT = 10000
 NEW_GAME_LIMIT = 10000
@@ -153,6 +153,8 @@ def join_roll(user_ID, gold):
   if check_if_gambling(user_ID) == True:
     if enough_gold(user_ID, int(gold)) == True:
       db[user_ID]["playing_current_game"] = True
+      print('{name} joined the current roll.'.format(name = user_ID))
+      webhook.send("{name} joined the current roll!".format(name = user_ID))
       return
     else:
       db[user_ID]["playing_current_game"] = False
@@ -166,6 +168,8 @@ def leave_roll(user_ID):
   user_ID = str(user_ID)
   if check_if_gambling(user_ID) == True:
     db[user_ID]["playing_current_game"] = False
+    print('{name} has left the current roll.'.format(name = user_ID))
+    webhook.send("{name} has left the current roll!".format(name = user_ID))
     return
   else:
     return
@@ -188,13 +192,13 @@ def gamble_roll():
   players = 0
   rolls = "---ROLLS---"
 
-  db["TEST"] = {
-      "name": str("TEST"),
-      "current_gold": 50000,
-      "overall_stats": 0,
-      "playing_current_game": False,
-      "current_game_roll": 0
-    }
+  #db["TEST"] = {
+      #"name": str("TEST"),
+      #"current_gold": 50000,
+      #"overall_stats": 0,
+      #"playing_current_game": False,
+      #"current_game_roll": 0
+    #}
 
   for key in db:
     if key == "The House#0000":
@@ -255,12 +259,16 @@ def gamble_roll():
 
   # restart roll timer
   x=datetime.today()
-  y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(hours=6)
+  print(x)
   # Thursday is power hour for raid.
-  if (x.hour < 6) and (datetime.today().weekday()) == 4:
-    y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=x.second, microsecond=0) + timedelta(minutes=10)
+  if (x.hour < 4) and (datetime.today().weekday() == 4):
+    y = x.replace(day=x.day, hour=x.hour, minute=x.minute, second=0, microsecond=0) + timedelta(minutes=10)
+  else:
+    y = x.replace(day=x.day, hour=x.hour, minute=0, second=0, microsecond=0) + timedelta(hours=6)
+  print(y)
   delta_t=y-x
   secs=delta_t.total_seconds()
+  print(secs)
   t = Timer(secs, gamble_roll)
   t.start()
   
@@ -321,9 +329,10 @@ async def on_message(message):
     gold = message[2]
     db[user_ID]["current_gold"] = gold
 
-for key in db:
-  db[key]["playing_current_game"] = False
-  db[key]["current_game_roll"] = 0
+# Clear the database.
+#for key in db:
+  #db[key]["playing_current_game"] = False
+  #db[key]["current_game_roll"] = 0
 
 # Set timing for first roll since it won't be exactly 6 hours from now.
 x=datetime.today()
@@ -333,12 +342,12 @@ if (x.hour < 4):
   y = x.replace(day=x.day, hour=4, minute=0, second=0, microsecond=0) + timedelta(days=0)
   #Thursday is power hour for raid.
   if datetime.today().weekday() == 4:
-    y = x.replace(day=x.day, hour=1, minute=30, second=0, microsecond=0) + timedelta(days=0)
-if (x.hour > 3) and (x.hour < 11):
+    y = x.replace(day=x.day, hour=2, minute=0, second=0, microsecond=0) + timedelta(days=0)
+if (x.hour > 3) and (x.hour < 10):
   y = x.replace(day=x.day, hour=10, minute=0, second=0, microsecond=0) + timedelta(days=0)
-if (x.hour > 9) and (x.hour < 17):
+if (x.hour > 9) and (x.hour < 16):
   y = x.replace(day=x.day, hour=16, minute=0, second=0, microsecond=0) + timedelta(days=0)
-if (x.hour > 15) and (x.hour < 23):
+if (x.hour > 15) and (x.hour < 22):
   y = x.replace(day=x.day, hour=22, minute=0, second=0, microsecond=0) + timedelta(days=0)
 if x.hour > 21:
   y = x.replace(day=x.day, hour=4, minute=0, second=0, microsecond=0) + timedelta(days=1)
@@ -348,13 +357,14 @@ secs=delta_t.total_seconds()
 print(secs)
 t = Timer(secs, gamble_roll)
 t.start()
-webhook.send('Welcome to Impetus Nox Gambling! A new game has started for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in {time} hours.'.format(limit = GAME_LIMIT, time = round(secs/60/60,1)))
+#webhook.send('Welcome to Impetus Nox Gambling! A new game has started for {limit} gold! Type **1** to join, **-1** to unjoin. The roll will close in {time} hours.'.format(limit = GAME_LIMIT, time = round(secs/60/60,1)))
 
 for key in db:
   if key == "The House#0000":
     del db["The House#0000"]
   if key == "TEST":
     del db["TEST"]
+  print('{name} - {playing}'.format(name = db[key]["name"], playing = db[key]["playing_current_game"]))
 
 keep_alive()
 client.run(os.getenv('TOKEN'))
