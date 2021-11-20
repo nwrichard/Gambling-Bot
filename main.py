@@ -7,14 +7,13 @@ from discord import Webhook, RequestsWebhookAdapter
 
 impetus_nox_webhook = os.environ['Impetus_Nox_Webhook']
 #beans_webhook = os.environ['Beans_Webhook']
-#laser_webhook = os.environ['Laser_House']
 
 webhook = Webhook.from_url(str(impetus_nox_webhook), adapter=RequestsWebhookAdapter())
 
 help_doc = "---Help Functions---\n!join - Enter the casino to be eligible for rolls. New players start with 100,000 gold.\n!stats - To view how much gold you currently have and how much you won/lost.\n!allstats - To view how much gold ALL players have and how much they won/lost.\n!limit x - Where x is the amount you want to change the limit to. At least 2 players must vote on this change. Change will take effect next roll."
 
-GAME_LIMIT = 10000
-NEW_GAME_LIMIT = 10000
+GAME_LIMIT = 25000
+NEW_GAME_LIMIT = 25000
 LIMIT_CHANGE = 0
 LIMIT_CHANGE_USER = ""
 LIMIT_CHANGE_VALUE = 0
